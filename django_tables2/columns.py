@@ -185,7 +185,7 @@ class LinkColumn(Column):
 
     :param attrs:
         a :class:`dict` of HTML attributes that are added to the rendered
-        ``<input type="checkbox" .../>`` tag
+        ``<a href="...">...</a>`` tag
 
     ** In order to create a link to a URL that relies on information in the
     current row, :class:`.Accessor` objects can be used in the ``args`` or
@@ -212,7 +212,7 @@ class LinkColumn(Column):
             name = tables.LinkColumn('people_detail', args=[A('pk')])
     """
     def __init__(self, viewname, urlconf=None, args=None, kwargs=None,
-                 current_app=None, attrs=None, **extra):
+                 current_app=None, attrs=None, link_text=None, **extra):
         super(LinkColumn, self).__init__(**extra)
         self.viewname = viewname
         self.urlconf = urlconf
@@ -220,6 +220,7 @@ class LinkColumn(Column):
         self.kwargs = kwargs
         self.current_app = current_app
         self.attrs = attrs or {}
+        self.link_text = link_text
 
     def render(self, value, record, bound_column):
         # Remember that value is actually what would have normally been put
@@ -260,7 +261,7 @@ class LinkColumn(Column):
         html = u'<a href="{url}" {attrs}>{value}</a>'.format(
             url=reverse(**params),
             attrs=AttributeDict(self.attrs).as_html(),
-            value=escape(value)
+            value=escape(self.link_text or value)
         )
         return mark_safe(html)
 
